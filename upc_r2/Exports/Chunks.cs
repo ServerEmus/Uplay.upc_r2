@@ -9,7 +9,7 @@ internal class Chunks
     [UnmanagedCallersOnly(EntryPoint = "UPC_InstallChunkListFree", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_InstallChunkListFree(IntPtr inContext, IntPtr inChunkList)
     {
-        Log.Information(nameof(UPC_InstallChunkListFree), [inContext, inChunkList]);
+        Log.Verbose(nameof(UPC_InstallChunkListFree), [inContext, inChunkList]);
         if (inContext == IntPtr.Zero || inChunkList == IntPtr.Zero)
             return (int)UPC_Result.UPC_Result_FailedPrecondition;
         //Basics.FreeList(inChunkList);
@@ -20,7 +20,7 @@ internal class Chunks
     [UnmanagedCallersOnly(EntryPoint = "UPC_InstallChunkListGet", CallConvs = [typeof(CallConvCdecl)])]
     public static unsafe int UPC_InstallChunkListGet(IntPtr inContext, [Out] IntPtr inChunkList)
     {
-        Log.Information(nameof(UPC_InstallChunkListGet), [inContext, inChunkList]);
+        Log.Verbose(nameof(UPC_InstallChunkListGet), [inContext, inChunkList]);
         if (inContext == IntPtr.Zero || inChunkList == IntPtr.Zero)
             return (int)UPC_Result.UPC_Result_FailedPrecondition;
         List<ChunkId> chunkIds = [];
@@ -35,21 +35,21 @@ internal class Chunks
     [UnmanagedCallersOnly(EntryPoint = "UPC_InstallChunksOrderUpdate", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_InstallChunksOrderUpdate(IntPtr inContext, IntPtr inChunkIds, uint inChunkCount)
     {
-        Log.Information(nameof(UPC_InstallChunksOrderUpdate), [inContext, inChunkIds, inChunkCount]);
+        Log.Verbose(nameof(UPC_InstallChunksOrderUpdate), [inContext, inChunkIds, inChunkCount]);
         return (int)UPC_Result.UPC_Result_Ok;
     }
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_InstallChunksOrderUpdate_Extended", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_InstallChunksOrderUpdate_Extended(IntPtr inContext, IntPtr inChunkIds, uint inChunkCount, IntPtr unk1, IntPtr unk2)
     {
-        Log.Information(nameof(UPC_InstallChunksOrderUpdate_Extended), [inContext, inChunkIds, inChunkCount, unk1, unk2]);
+        Log.Verbose(nameof(UPC_InstallChunksOrderUpdate_Extended), [inContext, inChunkIds, inChunkCount, unk1, unk2]);
         return (int)UPC_Result.UPC_Result_Ok;
     }
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_InstallChunksPresenceCheck", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_InstallChunksPresenceCheck(IntPtr inContext, IntPtr inChunkIds, uint inChunkCount)
     {
-        Log.Information(nameof(UPC_InstallChunksPresenceCheck), [inContext, inChunkIds, inChunkCount]);
+        Log.Verbose(nameof(UPC_InstallChunksPresenceCheck), [inContext, inChunkIds, inChunkCount]);
         return (int)UPC_Result.UPC_Result_Ok;
     }
 }

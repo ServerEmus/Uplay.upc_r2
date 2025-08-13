@@ -14,7 +14,7 @@ public class Main
     [UnmanagedCallersOnly(EntryPoint = "UPC_ContextCreate", CallConvs = [typeof(CallConvCdecl)])]
     public static IntPtr UPC_ContextCreate(uint inVersion, IntPtr inOptSetting)
     {
-        Log.Information(nameof(UPC_ContextCreate), [inVersion, inOptSetting]);
+        Log.Verbose(nameof(UPC_ContextCreate), [inVersion, inOptSetting]);
 
         if (FakeContextPTR != IntPtr.Zero)
             return FakeContextPTR;
@@ -27,7 +27,7 @@ public class Main
         {
             contextSettings = Marshal.PtrToStructure<UPC_ContextSettings>(inOptSetting);
         }
-        Log.Information(nameof(UPC_ContextCreate), ["Subsystems: ", contextSettings.subsystems]);
+        Log.Verbose(nameof(UPC_ContextCreate), ["Subsystems: ", contextSettings.subsystems]);
         Rsp Response = new()
         {
             InitRsp = new()
@@ -78,7 +78,7 @@ public class Main
             
         }
         */
-        Log.Information(nameof(UPC_ContextCreate), [Response]);
+        Log.Verbose(nameof(UPC_ContextCreate), [Response]);
         var initRsp = Response.InitRsp;
         GlobalContext.Config.Saved.account = initRsp.Account;
         GlobalContext.Config.Saved.savePath = initRsp.Storage.SavegameStoragePath;
@@ -88,7 +88,7 @@ public class Main
         FakeContext fc = new();
         FakeContextPTR = Marshal.AllocHGlobal(Marshal.SizeOf(fc));
         Marshal.StructureToPtr(fc, FakeContextPTR, false);
-        Log.Information(nameof(UPC_ContextCreate), ["Context ", FakeContextPTR]);
+        Log.Verbose(nameof(UPC_ContextCreate), ["Context ", FakeContextPTR]);
         return FakeContextPTR;
 
     }
@@ -96,7 +96,7 @@ public class Main
     [UnmanagedCallersOnly(EntryPoint = "UPC_ContextFree", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_ContextFree(IntPtr inContext)
     {
-        Log.Information(nameof(UPC_ContextFree), ["Freeing context", inContext]);
+        Log.Verbose(nameof(UPC_ContextFree), ["Freeing context", inContext]);
         Marshal.DestroyStructure<FakeContext>(inContext);
         Marshal.FreeHGlobal(inContext);
         GlobalContext = new();
@@ -114,20 +114,20 @@ public class Main
             Stopwatch.Start();
             return 0;
         }
-        Log.Information(nameof(UPC_Update), [Stopwatch.ElapsedTicks, UPC_Json.GetRoot().BasicLog.WaitBetweebUpdate]);
+        Log.Verbose(nameof(UPC_Update), [Stopwatch.ElapsedTicks, UPC_Json.GetRoot().BasicLog.WaitBetweebUpdate]);
         Stopwatch.Restart();
-        Log.Information(nameof(UPC_Update), [GlobalContext.Callbacks.Count]);
+        Log.Verbose(nameof(UPC_Update), [GlobalContext.Callbacks.Count]);
         foreach (var cb in GlobalContext.Callbacks)
         {
             if (cb.fun != IntPtr.Zero)
             {
-                Log.Information(nameof(UPC_Update), ["Callback run with: ", cb.fun, cb.Result, cb.context_data]);
+                Log.Verbose(nameof(UPC_Update), ["Callback run with: ", cb.fun, cb.Result, cb.context_data]);
                 delegate* unmanaged<int, void*, void> @Callback = (delegate* unmanaged<int, void*, void>)cb.fun;
-                Log.Information(nameof(UPC_Update), [cb.fun, "Is Calling!"]);
+                Log.Verbose(nameof(UPC_Update), [cb.fun, "Is Calling!"]);
                 @Callback(cb.Result, (void*)cb.context_data);
             }
         }
-        Log.Information(nameof(UPC_Update), ["Cleared Callbacks"]);
+        Log.Verbose(nameof(UPC_Update), ["Cleared Callbacks"]);
         GlobalContext.Callbacks.Clear();
         /*
          * Rsp Response = new();
@@ -161,30 +161,30 @@ public class Main
     [UnmanagedCallersOnly(EntryPoint = "UPC_Cancel", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_Cancel(IntPtr inContext, IntPtr inHandler)
     {
-        Log.Information(nameof(UPC_Cancel), [inContext, inHandler]);
+        Log.Verbose(nameof(UPC_Cancel), [inContext, inHandler]);
         return (int)UPC_Result.UPC_Result_Ok;
     }
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_EventNextPeek", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_EventNextPeek(IntPtr inContext, IntPtr outEvent)
     {
-        //Log.Information(nameof(UPC_EventNextPeek), new object[] { inContext, outEvent });
+        //Log.Verbose(nameof(UPC_EventNextPeek), new object[] { inContext, outEvent });
         return (int)UPC_Result.UPC_Result_Ok;
     }
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_EventNextPoll", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_EventNextPoll(IntPtr inContext, IntPtr outEvent)
     {
-        //Log.Information(nameof(UPC_EventNextPoll), new object[] { inContext, outEvent });
+        //Log.Verbose(nameof(UPC_EventNextPoll), new object[] { inContext, outEvent });
         return (int)UPC_Result.UPC_Result_NotFound;
     }
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_EventRegisterHandler", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_EventRegisterHandler(IntPtr inContext, uint inType, IntPtr inHandler, IntPtr inOptData)
     {
-        Log.Information(nameof(UPC_EventRegisterHandler), [inContext, inType, inHandler, inOptData]);
+        Log.Verbose(nameof(UPC_EventRegisterHandler), [inContext, inType, inHandler, inOptData]);
         var eventType = (UPC_EventType)inType;
-        Log.Information(nameof(UPC_EventRegisterHandler), ["EventType: ", eventType]);
+        Log.Verbose(nameof(UPC_EventRegisterHandler), ["EventType: ", eventType]);
         GlobalContext.Events.Add(new Event(eventType, inHandler, inOptData));
         return (int)UPC_Result.UPC_Result_Ok;
     }
@@ -192,7 +192,7 @@ public class Main
     [UnmanagedCallersOnly(EntryPoint = "UPC_EventUnregisterHandler", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_EventUnregisterHandler(IntPtr inContext, uint inType)
     {
-        Log.Information(nameof(UPC_EventUnregisterHandler), [inContext, inType]);
+        Log.Verbose(nameof(UPC_EventUnregisterHandler), [inContext, inType]);
         var eventRemove = GlobalContext.Events.Where(x => x.EventType == (UPC_EventType)inType);
         if (eventRemove.Any())
         {
@@ -214,7 +214,7 @@ public class Main
             Callbacks = [],
             Events = []
         };
-        Log.Information(nameof(UPC_Init), [inVersion, productId]);
+        Log.Verbose(nameof(UPC_Init), [inVersion, productId]);
         try
         {
             Rsp Response = new();
@@ -234,7 +234,7 @@ public class Main
                 }
             };
             LoadDll.LoadPlugins();
-            Log.Information(nameof(UPC_Init), [Response.InitProcessRsp.Result]);
+            Log.Verbose(nameof(UPC_Init), [Response.InitProcessRsp.Result]);
             return Response.InitProcessRsp.Result switch
             {
                 InitResult.Success => (int)UPC_InitResult.UPC_InitResult_Ok,
@@ -246,7 +246,7 @@ public class Main
         }
         catch (Exception ex)
         {
-            Log.Information(nameof(UPC_Init), [ex.ToString()]);
+            Log.Verbose(nameof(UPC_Init), [ex.ToString()]);
         }
         return 1;
     }
@@ -254,7 +254,7 @@ public class Main
     [UnmanagedCallersOnly(EntryPoint = "UPC_Uninit", CallConvs = [typeof(CallConvCdecl)])]
     public static void UPC_Uninit()
     {
-        Log.Information(nameof(UPC_Uninit));
+        Log.Verbose(nameof(UPC_Uninit));
         LoadDll.FreePlugins();
     }
 }

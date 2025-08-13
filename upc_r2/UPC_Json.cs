@@ -5,18 +5,30 @@ namespace upc_r2;
 
 public class UPC_Json
 {
-    public static Root GetRoot()
+    private static readonly string path = Path.Combine(AOTHelper.CurrentPath, "upc.json");
+    private static Root? instance;
+
+    public static Root Instance
     {
-        string file = Path.Combine(AOTHelper.CurrentPath, "upc.json");
-        if (!File.Exists(file))
+        get
         {
-            Root root = new();
-            File.WriteAllText(file, JsonSerializer.Serialize(root, JsonSourceGen.Default.Root));
-            return root;
+            if (instance != null)
+                return instance;
+            if (!File.Exists(path))
+            {
+                instance = new();
+                File.WriteAllText(path, JsonSerializer.Serialize(instance, JsonSourceGen.Default.Root));
+                return instance;
+            }
+            instance = JsonSerializer.Deserialize(File.ReadAllText(path), JsonSourceGen.Default.Root);
+            instance ??= new();
+            return instance;
         }
-        Root? data = JsonSerializer.Deserialize(File.ReadAllText(file), JsonSourceGen.Default.Root);
-        data ??= new();
-        return data;
+    }
+
+    public static void SaveToJson()
+    {
+        File.WriteAllText(path, JsonSerializer.Serialize(instance, JsonSourceGen.Default.Root));
     }
 
     public class BasicLog
@@ -37,12 +49,11 @@ public class UPC_Json
         public string Password { get; set; } = "user";
         public string Country { get; set; } = "en-US";
         public string Ticket { get; set; } = string.Empty;
-        public bool UseTicket { get; set; } = false;
     }
 
     public class Save
     {
-        public string Path { get; set; } = "upc_save";
+        public string Path { get; set; } = string.Empty;
         public bool UseProductIdInName { get; set; }
         public bool EnableFileDelete { get; set; }
     }

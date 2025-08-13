@@ -1,4 +1,6 @@
 ﻿using DllShared;
+using StbImageSharp;
+using Uplay.Uplaydll;
 
 namespace upc_r2.Exports;
 
@@ -9,7 +11,7 @@ internal class Avatar
     [UnmanagedCallersOnly(EntryPoint = "UPC_AvatarFree", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_AvatarFree(IntPtr inContext, IntPtr inImageRGBA)
     {
-        Log.Information(nameof(UPC_AvatarFree), [inContext, inImageRGBA]);
+        Log.Verbose("[{Function}] {inContext} {inImageRGBA}", nameof(UPC_AvatarFree), inContext, inImageRGBA);
         if (inImageRGBA == IntPtr.Zero)
             return 0;
         if (PtrToSize.TryGetValue(inImageRGBA, out int size))
@@ -22,59 +24,59 @@ internal class Avatar
     [UnmanagedCallersOnly(EntryPoint = "UPC_AvatarGet", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_AvatarGet(IntPtr inContext, IntPtr inOptUserIdUtf8, uint inSize, IntPtr outImageRGBA, IntPtr inCallback, IntPtr inCallbackData)
     {
-        try
+        Log.Verbose("[{Function}] {AvatarId} {AvatarSize} {OutRGBA} {Overlapped}", nameof(UPLAY_AVATAR_GetBitmap), AccountIdUtf8, AvatarSize, OutRGBA, Overlapped);
+        if (string.IsNullOrEmpty(UPC_Json.Instance.AvatarsPath))
         {
-            Log.Information(nameof(UPC_AvatarGet), [inContext, inOptUserIdUtf8, inSize, outImageRGBA, inCallback, inCallbackData]);
-            string? userId = Marshal.PtrToStringUTF8(inOptUserIdUtf8);
-            if (userId == null)
-                return -1;
-            UPC_AvatarSize size = (UPC_AvatarSize)inSize;
-            Log.Information(nameof(UPC_AvatarGet), [userId, size]);
-            // 16384 = 64
-            // 65536 = 128
-            // 262144 = 256
-            int avatarSize = ((size != UPC_AvatarSize.UPC_AvatarSize_64x64) ? ((size != UPC_AvatarSize.UPC_AvatarSize_128x128) ? 262144 : 65536) : 16384);
-            Log.Information(nameof(UPC_AvatarGet), ["Max Avatar Size", size]);
-            string myUserAvatar = Path.Combine(AOTHelper.CurrentPath, "avatars", $"{userId}_{inSize}.png");
-            string defaultUserAvatar = Path.Combine(AOTHelper.CurrentPath, "avatars", $"default_{inSize}.png");
-            if (!File.Exists(myUserAvatar) && !File.Exists(defaultUserAvatar))
-                return -1;
-            FileInfo? myFile = null;
-            if (File.Exists(myUserAvatar))
-            {
-                Log.Information(nameof(UPC_AvatarGet), ["Using User Avatar"]);
-                myFile = new FileInfo(myUserAvatar);
-            }
-            if (File.Exists(defaultUserAvatar))
-            {
-                Log.Information(nameof(UPC_AvatarGet), ["Using Default Avatar"]);
-                myFile = new FileInfo(defaultUserAvatar);
-            }
-            if (myFile == null)
-                return -1;
-            if (myFile.Length > avatarSize)
-                return -1;
-            byte[] avatarBuffer = new byte[avatarSize];
-            var stream = myFile.OpenRead();
-            Log.Information(nameof(UPC_AvatarGet), ["Start Reading | Here might crash :("]);
-            stream.ReadExactly(avatarBuffer, 0, (int)myFile.Length);
-            stream.Close();
-            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, 0));
-            PtrToSize.Add(outImageRGBA, avatarBuffer.Length);
-            Marshal.Copy(outImageRGBA, avatarBuffer, 0, avatarBuffer.Length);
+            Basics.WriteOverlappedResult(Overlapped, false, UPLAY_OverlappedResult.UPLAY_OverlappedResult_Failed);
+            return false;
         }
-        catch (Exception ex)
+        string? accountid = Marshal.PtrToStringAnsi(AccountIdUtf8);
+        if (string.IsNullOrEmpty(accountid))
         {
-            Log.Information(nameof(UPC_AvatarGet), ["Exception: ", ex]);
+            Basics.WriteOverlappedResult(Overlapped, false, UPLAY_OverlappedResult.UPLAY_OverlappedResult_Failed);
+            return false;
         }
-        return 0;
+        Uplay.Uplaydll.AvatarSize size = (Uplay.Uplaydll.AvatarSize)AvatarSize;
+        string sizeStr = size switch
+        {
+            Uplay.Uplaydll.AvatarSize._64 => "64",
+            Uplay.Uplaydll.AvatarSize._128 => "128",
+            Uplay.Uplaydll.AvatarSize._256 => "256",
+            _ => "64",
+        };
+        string path = Path.Combine(UPC_Json.Instance.AvatarsPath, $"{accountid}_{sizeStr}.png");
+        if (!File.Exists(path))
+        {
+            Basics.WriteOverlappedResult(Overlapped, false, UPLAY_OverlappedResult.UPLAY_OverlappedResult_Failed);
+            return false;
+        }
+        using var stream = File.OpenRead(path);
+        ImageResult image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
+        byte[] data = image.Data;
+        // Convert rgba to bgra
+        for (int i = 0; i < image.Width * image.Width; ++i)
+        {
+            byte r = data[i * 4];
+            byte g = data[i * 4 + 1];
+            byte b = data[i * 4 + 2];
+            byte a = data[i * 4 + 3];
+
+
+            data[i * 4] = b;
+            data[i * 4 + 1] = g;
+            data[i * 4 + 2] = r;
+            data[i * 4 + 3] = a;
+        }
+        Marshal.Copy(data, 0, OutRGBA, data.Length);
+        Basics.WriteOverlappedResult(Overlapped, true, UPLAY_OverlappedResult.UPLAY_OverlappedResult_Ok);
+        return true;
     }
 
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_BlacklistAdd", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_BlacklistAdd(IntPtr inContext, IntPtr inUserIdUtf8, IntPtr inOptCallback, IntPtr inOptCallbackData)
     {
-        Log.Information(nameof(UPC_BlacklistAdd), [inContext, inUserIdUtf8, inOptCallback, inOptCallbackData]);
+        Log.Verbose("[{Function}] {inContext} {inUserIdUtf8} {inOptCallback} {inOptCallbackData}", nameof(UPC_BlacklistAdd), inContext, inUserIdUtf8, inOptCallback, inOptCallbackData);
         return 0;
     }
 
@@ -82,14 +84,14 @@ internal class Avatar
     [UnmanagedCallersOnly(EntryPoint = "UPC_BlacklistHas", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_BlacklistHas(IntPtr inContext, IntPtr inUserIdUtf8)
     {
-        Log.Information(nameof(UPC_BlacklistHas), [inContext, inUserIdUtf8]);
+        Log.Verbose("[{Function}] {inContext} {inUserIdUtf8}", nameof(UPC_BlacklistHas), inContext, inUserIdUtf8);
         return 0;
     }
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_BlacklistHas_Extended", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_BlacklistHas_Extended(IntPtr inContext, IntPtr inUserIdUtf8, IntPtr isBlackListed)
     {
-        Log.Information(nameof(UPC_BlacklistHas_Extended), [inContext, inUserIdUtf8]);
+        Log.Verbose("[{Function}] {inContext} {inUserIdUtf8} {isBlackListed}", nameof(UPC_BlacklistHas_Extended), inContext, inUserIdUtf8, isBlackListed);
         Marshal.WriteByte(isBlackListed, 0);
         return 0;
     }
