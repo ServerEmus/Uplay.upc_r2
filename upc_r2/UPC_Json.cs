@@ -89,6 +89,7 @@ public class UPC_Json
         public List<Product> Products { get; set; } = [new() { ProductId = 0, Type = 4 }];
         public List<uint> AutoProductIds { get; set; } = [];
         public List<ChunkIds> ChunkIds { get; set; } = [];
+        public string AvatarsPath { get; set; } = string.Empty;
     }
 
 }
