@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
-namespace upc_r2.Exports;
+﻿namespace upc_r2.Exports;
 
 internal static class Friends
 {
@@ -30,9 +27,7 @@ internal static class Friends
     public static int UPC_FriendCheck_Extended(IntPtr inContext, IntPtr inUserIdUtf8, IntPtr checkPtr)
     {
         Log.Verbose(nameof(UPC_FriendCheck_Extended), [inContext, inUserIdUtf8]);
-        var mem = Marshal.AllocHGlobal(1);
-        Marshal.WriteByte(mem, 1);
-        Marshal.WriteIntPtr(checkPtr, 0, mem);
+        Marshal.WriteByte(checkPtr, 1);
         return 0;
     }
 

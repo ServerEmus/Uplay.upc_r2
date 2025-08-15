@@ -27,7 +27,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="ServerEmus.DllShared" Version="1.0.0" />
+		<PackageReference Include="ServerEmus.DllShared" Version="1.0.2" />
 		<PackageReference Include="ServerEmus.Shared" Version="1.1.0" />
 		<PackageReference Include="StbImageSharp" Version="2.30.15" Publicize="true" />
 		<PackageReference Include="Uplay-Protobufs" Version="161.1.11646" />

@@ -9,7 +9,6 @@ public struct FakeContext
 public class Context
 {
     public List<Callback> Callbacks = [];
-    public Config Config;
     public List<Event> Events = [];
 }
 
@@ -27,20 +26,6 @@ public struct Callback(IntPtr fn, IntPtr contextdata, int result)
     {
         return $"FunctionPtr: {fun} Result: {Result} Data: {context_data}";
     }
-}
-
-public struct Config
-{
-    public InitSaved Saved;
-    public uint ProductId;
-}
-
-public struct InitSaved
-{
-    public Uplay.Uplaydll.Account account;
-    public string savePath;
-    public string ubiTicket;
-    public string ApplicationId;
 }
 
 [StructLayout(LayoutKind.Sequential)]

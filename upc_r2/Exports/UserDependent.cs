@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
-namespace upc_r2.Exports;
+﻿namespace upc_r2.Exports;
 
 internal static class UserDependent
 {

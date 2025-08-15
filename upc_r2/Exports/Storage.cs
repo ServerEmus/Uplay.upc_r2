@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
-namespace upc_r2.Exports;
+﻿namespace upc_r2.Exports;
 
 internal static class Storage
 {
@@ -11,11 +8,14 @@ internal static class Storage
     public static int UPC_StorageFileListGet(IntPtr inContext, IntPtr outStorageFileList)
     {
         Log.Verbose(nameof(UPC_StorageFileListGet), [inContext, outStorageFileList]);
+        UPC_Context? context = UPC_ContextExt.GetContext(inContext);
+        if (context == null)
+            return (int)UPC_Result.UPC_Result_InternalError;
         List<UPC_StorageFile> storageFiles = [];
-        Log.Verbose(nameof(UPC_StorageFileListGet), [Main.GlobalContext.Config.Saved.savePath]);
-        if (!Directory.Exists(Main.GlobalContext.Config.Saved.savePath))
-            Directory.CreateDirectory(Main.GlobalContext.Config.Saved.savePath);
-        var files = Directory.GetFiles(Main.GlobalContext.Config.Saved.savePath);
+        Log.Verbose(nameof(UPC_StorageFileListGet), [UPC_Json.Instance.Save.Path]);
+        if (!Directory.Exists(UPC_Json.Instance.Save.Path))
+            Directory.CreateDirectory(UPC_Json.Instance.Save.Path);
+        var files = Directory.GetFiles(UPC_Json.Instance.Save.Path);
         foreach (var item in files)
         {
             if (string.IsNullOrEmpty(item))
@@ -52,14 +52,17 @@ internal static class Storage
     public static int UPC_StorageFileOpen(IntPtr inContext, IntPtr inFileNameUtf8, uint inFlags, IntPtr outHandle)
     {
         Log.Verbose(nameof(UPC_StorageFileOpen), [inContext, inFileNameUtf8, inFlags, outHandle]);
+        UPC_Context? context = UPC_ContextExt.GetContext(inContext);
+        if (context == null)
+            return (int)UPC_Result.UPC_Result_InternalError;
         string? filename = Marshal.PtrToStringUTF8(inFileNameUtf8);
         if (filename == null)
             return (int)UPC_Result.UPC_Result_CommunicationError;
         string file = string.Empty;
         if (UPC_Json.Instance.Save.UseProductIdInName)
-            file = Path.Combine(Main.GlobalContext.Config.Saved.savePath, Main.GlobalContext.Config.ProductId.ToString(), filename);
+            file = Path.Combine(UPC_Json.Instance.Save.Path, Init.ProductId.ToString(), filename);
         else
-            file = Path.Combine(Main.GlobalContext.Config.Saved.savePath, filename);
+            file = Path.Combine(UPC_Json.Instance.Save.Path, filename);
         if (!Directory.Exists(Path.GetDirectoryName(file)))
             Directory.CreateDirectory(Path.GetDirectoryName(file)!);
         if (!File.Exists(file))
@@ -75,24 +78,27 @@ internal static class Storage
     public static int UPC_StorageFileRead(IntPtr inContext, int inHandle, int inBytesToRead, uint inBytesReadOffset, IntPtr outData, IntPtr outBytesRead, IntPtr inCallback, IntPtr inCallbackData)
     {
         Log.Verbose(nameof(UPC_StorageFileRead), [inContext, inHandle, inBytesToRead, inBytesReadOffset, outData, outBytesRead, inCallback, inCallbackData]);
+        UPC_Context? context = UPC_ContextExt.GetContext(inContext);
+        if (context == null)
+            return (int)UPC_Result.UPC_Result_InternalError;
         if (inHandle == 0)
         {
-            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
+            context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
             return -13;
         }
         if (!PtrToFilePath.TryGetValue(inHandle, out string? path))
         {
-            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
+            context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
             return -13;
         }
         if (path == null)
         {
-            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
+            context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
             return -13;
         }
         if (inBytesToRead <= 0)
         {
-            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
+            context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
             return -13;
         }
 
@@ -100,7 +106,7 @@ internal static class Storage
         stream.Seek(0, SeekOrigin.Begin);
         if (stream.Length < inBytesReadOffset)
         {
-            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_EOF));
+            context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_EOF));
             return -13;
         }
         var buff = new byte[inBytesToRead];
@@ -109,12 +115,12 @@ internal static class Storage
         Log.Verbose(nameof(UPC_StorageFileRead), ["bytes readed:", readed, "must read:", inBytesToRead]);
         if (readed < 0)
         {
-            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_EOF));
+            context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_EOF));
             return -13;
         }
         Marshal.WriteInt32(outBytesRead, readed);
         Marshal.Copy(buff, 0, outData, buff.Length);
-        Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_Ok));
+        context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_Ok));
         Log.Verbose(nameof(UPC_StorageFileRead), ["Read Done!"]);
         return 0x10000;
     }
@@ -123,14 +129,17 @@ internal static class Storage
     public static int UPC_StorageFileWrite(IntPtr inContext, int inHandle, IntPtr inData, int inSize, IntPtr inCallback, IntPtr inCallbackData)
     {
         Log.Verbose(nameof(UPC_StorageFileWrite), [inContext, inHandle, inData, inSize, inCallback, inCallbackData]);
+        UPC_Context? context = UPC_ContextExt.GetContext(inContext);
+        if (context == null)
+            return (int)UPC_Result.UPC_Result_InternalError;
         if (!PtrToFilePath.TryGetValue(inHandle, out string? path))
         {
-            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
+            context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
             return -13;
         }
         if (path == null)
         {
-            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
+            context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
             return -13;
         }
         var stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
@@ -139,7 +148,7 @@ internal static class Storage
         stream.Write(buff);
         stream.Flush(true);
         stream.Close();
-        Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_Ok));
+        context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_Ok));
         Log.Verbose(nameof(UPC_StorageFileWrite), ["Write Done!"]);
         return 0x10000;
     }
@@ -156,6 +165,9 @@ internal static class Storage
     public static int UPC_StorageFileDelete(IntPtr inContext, IntPtr inFileNameUtf8)
     {
         Log.Verbose(nameof(UPC_StorageFileDelete), [inContext, inFileNameUtf8]);
+        UPC_Context? context = UPC_ContextExt.GetContext(inContext);
+        if (context == null)
+            return (int)UPC_Result.UPC_Result_InternalError;
         if (UPC_Json.Instance.Save.EnableFileDelete)
         {
             string? fileName = Marshal.PtrToStringUTF8(inFileNameUtf8);
@@ -163,9 +175,9 @@ internal static class Storage
                 return 0;
             string file = string.Empty;
             if (UPC_Json.Instance.Save.UseProductIdInName)
-                file = Path.Combine(Main.GlobalContext.Config.Saved.savePath, Main.GlobalContext.Config.ProductId.ToString(), fileName);
+                file = Path.Combine(UPC_Json.Instance.Save.Path, Init.ProductId.ToString(), fileName);
             else
-                file = Path.Combine(Main.GlobalContext.Config.Saved.savePath, fileName);
+                file = Path.Combine(UPC_Json.Instance.Save.Path, fileName);
             if (string.IsNullOrEmpty(file))
                 return 0;
             File.Delete(file);

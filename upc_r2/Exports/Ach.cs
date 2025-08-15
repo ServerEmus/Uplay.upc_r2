@@ -13,7 +13,10 @@ internal static class Ach
     public static int UPC_AchievementImageGet(IntPtr inContext, uint inId, IntPtr outImageRGBA, IntPtr inCallback, IntPtr inCallbackData)
     {
         Log.Verbose("[{Function}] {inContext} {inId} {outImageRGBA} {inCallback} {inCallbackData}", nameof(UPC_AchievementImageGet), inContext, inId, outImageRGBA, inCallback, inCallbackData);
-        Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_CommunicationError));
+        UPC_Context? context = UPC_ContextExt.GetContext(inContext);
+        if (context == null)
+            return (int)UPC_Result.UPC_Result_InternalError;
+        context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_CommunicationError));
         return 0;
     }
 
@@ -28,7 +31,10 @@ internal static class Ach
     public static int UPC_AchievementListGet(IntPtr inContext, IntPtr inOptUserIdUtf8, uint inFilter, IntPtr outAchievementList, IntPtr inCallback, IntPtr inCallbackData)
     {
         Log.Verbose("[{Function}] {inContext} {inId} {inOptUserIdUtf8} {inFilter} {outAchievementList} {inCallback} {inCallbackData}", nameof(UPC_AchievementListGet), inContext, inOptUserIdUtf8, inFilter, outAchievementList, inCallback, inCallbackData);
-        Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_CommunicationError));
+        UPC_Context? context = UPC_ContextExt.GetContext(inContext);
+        if (context == null)
+            return (int)UPC_Result.UPC_Result_InternalError;
+        context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_CommunicationError));
         WriteOutList(outAchievementList, 0, IntPtr.Zero);
         return 2000;
     }
@@ -37,7 +43,10 @@ internal static class Ach
     public static int UPC_AchievementUnlock(IntPtr inContext, uint inId, IntPtr inOptCallback, IntPtr inOptCallbackData)
     {
         Log.Verbose("[{Function}] {inContext} {inId} {inCallback} {inCallbackData}", nameof(UPC_AchievementUnlock), inContext, inId, inOptCallback, inOptCallbackData);
-        Main.GlobalContext.Callbacks.Add(new(inOptCallback, inOptCallbackData, (int)UPC_Result.UPC_Result_CommunicationError));
+        UPC_Context? context = UPC_ContextExt.GetContext(inContext);
+        if (context == null)
+            return (int)UPC_Result.UPC_Result_InternalError;
+        context.Callbacks.Add(new(inOptCallback, inOptCallbackData, (int)UPC_Result.UPC_Result_CommunicationError));
         return 0;
     }
 }

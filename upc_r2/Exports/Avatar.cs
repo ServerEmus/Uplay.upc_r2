@@ -1,5 +1,4 @@
-﻿using DllShared;
-using StbImageSharp;
+﻿using StbImageSharp;
 using Uplay.Uplaydll;
 
 namespace upc_r2.Exports;
@@ -22,29 +21,32 @@ internal static class Avatar
     public static int UPC_AvatarGet(IntPtr inContext, IntPtr inOptUserIdUtf8, uint inSize, IntPtr outImageRGBA, IntPtr inCallback, IntPtr inCallbackData)
     {
         Log.Verbose("[{Function}] {inContext} {inImageRGBA} {inSize} {outImageRGBA} {inCallback} {inCallbackData}", nameof(UPC_AvatarGet), inContext, inOptUserIdUtf8, inSize, outImageRGBA, inCallback, inCallbackData);
+        UPC_Context? context = UPC_ContextExt.GetContext(inContext);
+        if (context == null)
+            return (int)UPC_Result.UPC_Result_InternalError;
         if (string.IsNullOrEmpty(UPC_Json.Instance.AvatarsPath))
         {
-            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
+            context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
             return -1;
         }
         string? accountid = Marshal.PtrToStringAnsi(inOptUserIdUtf8);
         if (string.IsNullOrEmpty(accountid))
         {
-            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
+            context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
             return -1;
         }
-        Uplay.Uplaydll.AvatarSize size = (Uplay.Uplaydll.AvatarSize)inSize;
+        AvatarSize size = (AvatarSize)inSize;
         string sizeStr = size switch
         {
-            Uplay.Uplaydll.AvatarSize._64 => "64",
-            Uplay.Uplaydll.AvatarSize._128 => "128",
-            Uplay.Uplaydll.AvatarSize._256 => "256",
+            AvatarSize._64 => "64",
+            AvatarSize._128 => "128",
+            AvatarSize._256 => "256",
             _ => "64",
         };
         string path = Path.Combine(UPC_Json.Instance.AvatarsPath, $"{accountid}_{sizeStr}.png");
         if (!File.Exists(path))
         {
-            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
+            context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
             return -1;
         }
         using var stream = File.OpenRead(path);
@@ -65,7 +67,7 @@ internal static class Avatar
             data[i * 4 + 3] = a;
         }
         Marshal.Copy(data, 0, outImageRGBA, data.Length);
-        Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_Ok));
+        context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_Ok));
         return 0;
     }
 
@@ -74,7 +76,10 @@ internal static class Avatar
     public static int UPC_BlacklistAdd(IntPtr inContext, IntPtr inUserIdUtf8, IntPtr inOptCallback, IntPtr inOptCallbackData)
     {
         Log.Verbose("[{Function}] {inContext} {inUserIdUtf8} {inOptCallback} {inOptCallbackData}", nameof(UPC_BlacklistAdd), inContext, inUserIdUtf8, inOptCallback, inOptCallbackData);
-        Main.GlobalContext.Callbacks.Add(new(inOptCallback, inOptCallbackData, (int)UPC_Result.UPC_Result_Ok));
+        UPC_Context? context = UPC_ContextExt.GetContext(inContext);
+        if (context == null)
+            return (int)UPC_Result.UPC_Result_InternalError;
+        context.Callbacks.Add(new(inOptCallback, inOptCallbackData, (int)UPC_Result.UPC_Result_Ok));
         return 0;
     }
 

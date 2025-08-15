@@ -1,6 +1,4 @@
-﻿using DllShared;
-
-namespace upc_r2.Exports;
+﻿namespace upc_r2.Exports;
 
 internal static class Other
 {
@@ -25,7 +23,7 @@ internal static class Other
     public static int UPC_ApplicationIdGet(IntPtr inContext, IntPtr outAppId)
     {
         Log.Verbose("[{Function}] {inContext} {outAppId}", nameof(UPC_ApplicationIdGet), inContext, outAppId);
-        Marshal.WriteIntPtr(outAppId, Marshal.StringToHGlobalAnsi(Main.GlobalContext.Config.Saved.ApplicationId));
+        Marshal.WriteIntPtr(outAppId, Marshal.StringToHGlobalAnsi(UPC_Json.Instance.Others.ApplicationId));
         return 0;
     }
 

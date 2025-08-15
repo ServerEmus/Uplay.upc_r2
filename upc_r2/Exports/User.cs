@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
-namespace upc_r2.Exports;
+﻿namespace upc_r2.Exports;
 
 internal static class User
 {
@@ -9,30 +6,31 @@ internal static class User
     public static int UPC_UserGet(IntPtr inContext, IntPtr inOptUserIdUtf8, IntPtr outUser, IntPtr inCallback, IntPtr inCallbackData)
     {
         Log.Verbose(nameof(UPC_UserGet), [inContext, inOptUserIdUtf8, outUser, inCallback, inCallbackData]);
-        Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, 0));
+        UPC_Context? context = UPC_ContextExt.GetContext(inContext);
+        if (context == null)
+            return (int)UPC_Result.UPC_Result_InternalError;
+        context.Callbacks.Add(new(inCallback, inCallbackData, 0));
 
         UPC_User user = new()
         {
-            idUtf8 = Main.GlobalContext.Config.Saved.account.AccountId,
-            nameUtf8 = Main.GlobalContext.Config.Saved.account.NameOnPlatform,
+            idUtf8 = UPC_Json.Instance.Account.AccountId,
+            nameUtf8 = UPC_Json.Instance.Account.Name,
             relationship = Uplay.Uplaydll.Relationship.None,
             presence = new()
             {
                 onlineStatus = Uplay.Uplaydll.OnlineStatusV2.OnlineStatusOnline,
                 multiplayerSize = 1,
                 multiplayerMaxSize = 1,
-                detailsUtf8 = $"Playing {Main.GlobalContext.Config}",
+                detailsUtf8 = $"Playing {Init.ProductId}",
                 multiplayerId = Guid.NewGuid().ToString(),
                 multiplayerInternalData = [],
                 multiplayerJoinable = 0, // Disable joinable lobbies
-                titleId = Main.GlobalContext.Config.ProductId,
-                titleNameUtf8 = $"Product {Main.GlobalContext.Config}"
+                titleId = Init.ProductId,
+                titleNameUtf8 = $"Product {Init.ProductId}"
             }
         };
         var impl = UPC_UserImpl.BuildFrom(user);
-        IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf<UPC_UserImpl>());
-        Marshal.StructureToPtr(impl, ptr, false);
-        Marshal.WriteIntPtr(outUser, ptr);
+        Marshal.WriteIntPtr(outUser, impl.ToIntPtr());
         return 0x10000;
     }
 
