@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace upc_r2.Exports;
 
-internal class Friends
+internal static class Friends
 {
     [UnmanagedCallersOnly(EntryPoint = "UPC_FriendAdd", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_FriendAdd(IntPtr inContext, IntPtr inSearchStringUtf8, IntPtr inOptCallback, IntPtr inOptCallbackData)

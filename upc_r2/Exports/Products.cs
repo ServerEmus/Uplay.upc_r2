@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace upc_r2.Exports;
 
-internal class Products
+internal static class Products
 {
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_ProductListGet", CallConvs = [typeof(CallConvCdecl)])]
@@ -25,11 +25,11 @@ internal class Products
         [
             new(Main.GlobalContext.Config.ProductId, 1)
         ];
-        foreach (var item in UPC_Json.GetRoot().Products)
+        foreach (var item in UPC_Json.Instance.Products)
         {
             products.Add(new(item.ProductId, item.Type));
         }
-        foreach (var item in UPC_Json.GetRoot().AutoProductIds)
+        foreach (var item in UPC_Json.Instance.AutoProductIds)
         {
             products.Add(new(item, 2));
         }

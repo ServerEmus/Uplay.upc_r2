@@ -34,26 +34,26 @@ public class Main
             {
                 Account = new()
                 {
-                    AccountId = UPC_Json.GetRoot().Account.AccountId,
-                    Country = UPC_Json.GetRoot().Account.Country,
-                    Email = UPC_Json.GetRoot().Account.Email,
-                    NameOnPlatform = UPC_Json.GetRoot().Account.Name,
-                    Username = UPC_Json.GetRoot().Account.Name,
-                    Password = UPC_Json.GetRoot().Account.Password
+                    AccountId = UPC_Json.Instance.Account.AccountId,
+                    Country = UPC_Json.Instance.Account.Country,
+                    Email = UPC_Json.Instance.Account.Email,
+                    NameOnPlatform = UPC_Json.Instance.Account.Name,
+                    Username = UPC_Json.Instance.Account.Name,
+                    Password = UPC_Json.Instance.Account.Password
                 },
-                UpcTicket = UPC_Json.GetRoot().Account.Ticket,
+                UpcTicket = UPC_Json.Instance.Account.Ticket,
                 Storage = new()
                 {
-                    SavegameStoragePath = UPC_Json.GetRoot().Save.Path
+                    SavegameStoragePath = UPC_Json.Instance.Save.Path
                 },
                 UbiServices = new()
                 {
-                    AppId = UPC_Json.GetRoot().Others.ApplicationId,
+                    AppId = UPC_Json.Instance.Others.ApplicationId,
                 }
             }
         };
         /*
-        if (UPC_Json.GetRoot().BasicLog.UseNamePipeClient)
+        if (UPC_Json.Instance.BasicLog.UseNamePipeClient)
         {
             Basics.SendReq(new Req()
             {
@@ -109,12 +109,12 @@ public class Main
     {
         //Internal waiting update for reason
         Stopwatch.Stop();
-        if (Stopwatch.ElapsedTicks <= UPC_Json.GetRoot().BasicLog.WaitBetweebUpdate)
+        if (Stopwatch.ElapsedTicks <= UPC_Json.Instance.BasicLog.WaitBetweebUpdate)
         {
             Stopwatch.Start();
             return 0;
         }
-        Log.Verbose(nameof(UPC_Update), [Stopwatch.ElapsedTicks, UPC_Json.GetRoot().BasicLog.WaitBetweebUpdate]);
+        Log.Verbose(nameof(UPC_Update), [Stopwatch.ElapsedTicks, UPC_Json.Instance.BasicLog.WaitBetweebUpdate]);
         Stopwatch.Restart();
         Log.Verbose(nameof(UPC_Update), [GlobalContext.Callbacks.Count]);
         foreach (var cb in GlobalContext.Callbacks)

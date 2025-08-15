@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace upc_r2.Exports;
 
-public class UserDependent
+internal static class UserDependent
 {
     [UnmanagedCallersOnly(EntryPoint = "UPC_EmailGet", CallConvs = [typeof(CallConvCdecl)])]
     public static IntPtr UPC_EmailGet(IntPtr inContext)
@@ -61,7 +61,7 @@ public class UserDependent
     public static IntPtr UPC_TicketGet(IntPtr inContext)
     {
         Log.Verbose(nameof(UPC_TicketGet), [inContext]);
-        if (UPC_Json.GetRoot().Account.UseTicket)
+        if (UPC_Json.Instance.Account.UseTicket)
         {
             string? ticket = !string.IsNullOrEmpty(Main.GlobalContext.Config.Saved.ubiTicket) ? Main.GlobalContext.Config.Saved.ubiTicket : null;
             Log.Verbose(nameof(UPC_TicketGet), [ticket == null]);
@@ -74,7 +74,7 @@ public class UserDependent
     public static int UPC_TicketGet_Extended(IntPtr inContext, IntPtr ticketPtr)
     {
         Log.Verbose(nameof(UPC_TicketGet_Extended), [inContext]);
-        if (UPC_Json.GetRoot().Account.UseTicket)
+        if (UPC_Json.Instance.Account.UseTicket)
         {
             string? ticket = !string.IsNullOrEmpty(Main.GlobalContext.Config.Saved.ubiTicket) ? Main.GlobalContext.Config.Saved.ubiTicket : null;
             Log.Verbose(nameof(UPC_TicketGet_Extended), [ticket == null]);

@@ -3,9 +3,8 @@ using System.Runtime.InteropServices;
 
 namespace upc_r2.Exports;
 
-internal class Chunks
+internal static class Chunks
 {
-
     [UnmanagedCallersOnly(EntryPoint = "UPC_InstallChunkListFree", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_InstallChunkListFree(IntPtr inContext, IntPtr inChunkList)
     {
@@ -24,7 +23,7 @@ internal class Chunks
         if (inContext == IntPtr.Zero || inChunkList == IntPtr.Zero)
             return (int)UPC_Result.UPC_Result_FailedPrecondition;
         List<ChunkId> chunkIds = [];
-        foreach (var item in UPC_Json.GetRoot().ChunkIds)
+        foreach (var item in UPC_Json.Instance.ChunkIds)
         {
             chunkIds.Add(new() { Id = item.ChunkId, IsInstalled = 1, Tag = item.ChunkTag });
         }

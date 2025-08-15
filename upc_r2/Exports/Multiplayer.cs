@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace upc_r2.Exports;
 
-internal class Multiplayer
+internal static class Multiplayer
 {
     [UnmanagedCallersOnly(EntryPoint = "UPC_MultiplayerInvite", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_MultiplayerInvite(IntPtr inContext, IntPtr inUserIdUtf8, IntPtr inOptCallback, IntPtr inOptCallbackData)

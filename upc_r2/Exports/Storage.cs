@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace upc_r2.Exports;
 
-internal class Storage
+internal static class Storage
 {
     static readonly Dictionary<int, string> PtrToFilePath = [];
 
@@ -56,7 +56,7 @@ internal class Storage
         if (filename == null)
             return (int)UPC_Result.UPC_Result_CommunicationError;
         string file = string.Empty;
-        if (UPC_Json.GetRoot().Save.UseProductIdInName)
+        if (UPC_Json.Instance.Save.UseProductIdInName)
             file = Path.Combine(Main.GlobalContext.Config.Saved.savePath, Main.GlobalContext.Config.ProductId.ToString(), filename);
         else
             file = Path.Combine(Main.GlobalContext.Config.Saved.savePath, filename);
@@ -156,13 +156,13 @@ internal class Storage
     public static int UPC_StorageFileDelete(IntPtr inContext, IntPtr inFileNameUtf8)
     {
         Log.Verbose(nameof(UPC_StorageFileDelete), [inContext, inFileNameUtf8]);
-        if (UPC_Json.GetRoot().Save.EnableFileDelete)
+        if (UPC_Json.Instance.Save.EnableFileDelete)
         {
             string? fileName = Marshal.PtrToStringUTF8(inFileNameUtf8);
             if (string.IsNullOrEmpty(fileName))
                 return 0;
             string file = string.Empty;
-            if (UPC_Json.GetRoot().Save.UseProductIdInName)
+            if (UPC_Json.Instance.Save.UseProductIdInName)
                 file = Path.Combine(Main.GlobalContext.Config.Saved.savePath, Main.GlobalContext.Config.ProductId.ToString(), fileName);
             else
                 file = Path.Combine(Main.GlobalContext.Config.Saved.savePath, fileName);

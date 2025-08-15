@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace upc_r2.Exports;
 
-internal class Store
+internal static class Store
 {
     [UnmanagedCallersOnly(EntryPoint = "UPC_StoreCheckout", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_StoreCheckout(IntPtr inContext, uint inId)

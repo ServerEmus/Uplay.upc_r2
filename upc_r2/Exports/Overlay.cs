@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace upc_r2.Exports;
 
-internal class Overlay
+internal static class Overlay
 {
     [UnmanagedCallersOnly(EntryPoint = "UPC_ShowBrowserUrl", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_ShowBrowserUrl(IntPtr inContext, IntPtr inBrowserUrlUtf8)

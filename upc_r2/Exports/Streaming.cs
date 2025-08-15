@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace upc_r2.Exports;
 
-internal class Streaming
+internal static class Streaming
 {
     [UnmanagedCallersOnly(EntryPoint = "UPC_StreamingCurrentUserCountryFree", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_StreamingCurrentUserCountryFree(IntPtr inContext, IntPtr intUtf8Country)

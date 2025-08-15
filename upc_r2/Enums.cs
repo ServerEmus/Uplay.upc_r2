@@ -216,9 +216,3 @@ public enum UPC_EventType : uint
     UPC_Event_StreamingInputTypeUpdated,
     UPC_Event_StreamingResolutionUpdated
 }
-public enum UPC_AvatarSize : uint
-{
-    UPC_AvatarSize_64x64,
-    UPC_AvatarSize_128x128,
-    UPC_AvatarSize_256x256
-}

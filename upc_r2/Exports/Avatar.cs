@@ -4,7 +4,7 @@ using Uplay.Uplaydll;
 
 namespace upc_r2.Exports;
 
-internal class Avatar
+internal static class Avatar
 {
     static readonly Dictionary<IntPtr, int> PtrToSize = [];
 
@@ -14,27 +14,24 @@ internal class Avatar
         Log.Verbose("[{Function}] {inContext} {inImageRGBA}", nameof(UPC_AvatarFree), inContext, inImageRGBA);
         if (inImageRGBA == IntPtr.Zero)
             return 0;
-        if (PtrToSize.TryGetValue(inImageRGBA, out int size))
-        {
-
-        }
+        Marshal.FreeHGlobal(inImageRGBA);
         return 0;
     }
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_AvatarGet", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_AvatarGet(IntPtr inContext, IntPtr inOptUserIdUtf8, uint inSize, IntPtr outImageRGBA, IntPtr inCallback, IntPtr inCallbackData)
     {
-        Log.Verbose("[{Function}] {AvatarId} {AvatarSize} {OutRGBA} {Overlapped}", nameof(UPLAY_AVATAR_GetBitmap), AccountIdUtf8, AvatarSize, OutRGBA, Overlapped);
+        Log.Verbose("[{Function}] {inContext} {inImageRGBA} {inSize} {outImageRGBA} {inCallback} {inCallbackData}", nameof(UPC_AvatarGet), inContext, inOptUserIdUtf8, inSize, outImageRGBA, inCallback, inCallbackData);
         if (string.IsNullOrEmpty(UPC_Json.Instance.AvatarsPath))
         {
-            Basics.WriteOverlappedResult(Overlapped, false, UPLAY_OverlappedResult.UPLAY_OverlappedResult_Failed);
-            return false;
+            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
+            return -1;
         }
         string? accountid = Marshal.PtrToStringAnsi(AccountIdUtf8);
         if (string.IsNullOrEmpty(accountid))
         {
-            Basics.WriteOverlappedResult(Overlapped, false, UPLAY_OverlappedResult.UPLAY_OverlappedResult_Failed);
-            return false;
+            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
+            return -1;
         }
         Uplay.Uplaydll.AvatarSize size = (Uplay.Uplaydll.AvatarSize)AvatarSize;
         string sizeStr = size switch
@@ -47,8 +44,8 @@ internal class Avatar
         string path = Path.Combine(UPC_Json.Instance.AvatarsPath, $"{accountid}_{sizeStr}.png");
         if (!File.Exists(path))
         {
-            Basics.WriteOverlappedResult(Overlapped, false, UPLAY_OverlappedResult.UPLAY_OverlappedResult_Failed);
-            return false;
+            Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_FailedPrecondition));
+            return -1;
         }
         using var stream = File.OpenRead(path);
         ImageResult image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
@@ -68,8 +65,8 @@ internal class Avatar
             data[i * 4 + 3] = a;
         }
         Marshal.Copy(data, 0, OutRGBA, data.Length);
-        Basics.WriteOverlappedResult(Overlapped, true, UPLAY_OverlappedResult.UPLAY_OverlappedResult_Ok);
-        return true;
+        Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_Ok));
+        return 0;
     }
 
 
@@ -77,6 +74,7 @@ internal class Avatar
     public static int UPC_BlacklistAdd(IntPtr inContext, IntPtr inUserIdUtf8, IntPtr inOptCallback, IntPtr inOptCallbackData)
     {
         Log.Verbose("[{Function}] {inContext} {inUserIdUtf8} {inOptCallback} {inOptCallbackData}", nameof(UPC_BlacklistAdd), inContext, inUserIdUtf8, inOptCallback, inOptCallbackData);
+        Main.GlobalContext.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_Ok));
         return 0;
     }
 
