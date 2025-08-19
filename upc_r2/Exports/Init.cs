@@ -1,14 +1,19 @@
 ﻿using DllShared;
+using Shared;
 using Uplay.Uplaydll;
 
 namespace upc_r2.Exports;
 
-internal static class Init
+internal static partial class Export
 {
     public static uint ProductId;
+
     [UnmanagedCallersOnly(EntryPoint = "UPC_Init", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_Init(uint inVersion, int productId)
     {
+        MainLogger.LevelSwitch.MinimumLevel = UPC_Json.Instance.BasicLog.LogLevel;
+        MainLogger.FileLevelSwitch.MinimumLevel = UPC_Json.Instance.BasicLog.LogLevel;
+        MainLogger.CreateNew();
         Log.Verbose("[{Function}] {inVersion} {productId}", nameof(UPC_Init), inVersion, productId);
         ProductId = (uint)productId;
         LoadDll.LoadPlugins();
@@ -30,5 +35,6 @@ internal static class Init
         Log.Verbose("[{Function}]", nameof(UPC_Uninit));
         ProductId = 0;
         LoadDll.FreePlugins();
+        MainLogger.Close();
     }
 }

@@ -3,10 +3,8 @@ using Uplay.Uplaydll;
 
 namespace upc_r2.Exports;
 
-internal static class Avatar
+internal static partial class Export
 {
-    static readonly Dictionary<IntPtr, int> PtrToSize = [];
-
     [UnmanagedCallersOnly(EntryPoint = "UPC_AvatarFree", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_AvatarFree(IntPtr inContext, IntPtr inImageRGBA)
     {

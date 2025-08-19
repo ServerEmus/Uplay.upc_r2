@@ -1,13 +1,11 @@
 ﻿namespace upc_r2.Exports;
 
-internal static class Contexts
+internal static partial class Export
 {
     [UnmanagedCallersOnly(EntryPoint = "UPC_ContextCreate", CallConvs = [typeof(CallConvCdecl)])]
     public static IntPtr UPC_ContextCreate(uint inVersion, IntPtr inOptSetting)
     {
         Log.Verbose("[{Function}] {inVersion} {inOptSetting}", nameof(UPC_ContextCreate), inVersion, inOptSetting);
-        Log.Verbose(nameof(UPC_ContextCreate), [inVersion, inOptSetting]);
-
         UPC_ContextSettings contextSettings = new()
         {
             subsystems = UPC_ContextSubsystem.UPC_ContextSubsystem_None

@@ -6,12 +6,6 @@ public struct FakeContext
     public int FakeContextInt;
 }
 
-public class Context
-{
-    public List<Callback> Callbacks = [];
-    public List<Event> Events = [];
-}
-
 [StructLayout(LayoutKind.Sequential)]
 public struct Callback(IntPtr fn, IntPtr contextdata, int result)
 {

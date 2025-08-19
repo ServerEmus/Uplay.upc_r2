@@ -1,6 +1,6 @@
 ﻿namespace upc_r2.Exports;
 
-internal static class Chunks
+internal static partial class Export
 {
     [UnmanagedCallersOnly(EntryPoint = "UPC_InstallChunkListFree", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_InstallChunkListFree(IntPtr inContext, IntPtr inChunkList)

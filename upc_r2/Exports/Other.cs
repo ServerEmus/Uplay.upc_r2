@@ -1,6 +1,6 @@
 ﻿namespace upc_r2.Exports;
 
-internal static class Other
+internal static partial class Export
 {
     [UnmanagedCallersOnly(EntryPoint = "UPC_CPUScoreGet", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_CPUScoreGet(IntPtr inContext, IntPtr outScore)

@@ -1,6 +1,6 @@
 ﻿namespace upc_r2.Exports;
 
-internal static class Ach
+internal static partial class Export
 {
     [UnmanagedCallersOnly(EntryPoint = "UPC_AchievementImageFree", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_AchievementImageFree(IntPtr inContext, IntPtr inImageRGBA)

@@ -1,18 +1,18 @@
 ﻿namespace upc_r2.Exports;
 
-internal static class Storage
+internal static partial class Export
 {
     static readonly Dictionary<int, string> PtrToFilePath = [];
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_StorageFileListGet", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_StorageFileListGet(IntPtr inContext, IntPtr outStorageFileList)
     {
-        Log.Verbose(nameof(UPC_StorageFileListGet), [inContext, outStorageFileList]);
+        Log.Verbose("[{Function}] {inContext} {outStorageFileList}", nameof(UPC_StorageFileListGet), inContext, outStorageFileList);
         UPC_Context? context = UPC_ContextExt.GetContext(inContext);
         if (context == null)
             return (int)UPC_Result.UPC_Result_InternalError;
         List<UPC_StorageFile> storageFiles = [];
-        Log.Verbose(nameof(UPC_StorageFileListGet), [UPC_Json.Instance.Save.Path]);
+        Log.Verbose("[{Function}] Save Path: {Path}", nameof(UPC_StorageFileListGet), UPC_Json.Instance.Save.Path);
         if (!Directory.Exists(UPC_Json.Instance.Save.Path))
             Directory.CreateDirectory(UPC_Json.Instance.Save.Path);
         var files = Directory.GetFiles(UPC_Json.Instance.Save.Path);
@@ -31,7 +31,7 @@ internal static class Storage
             };
             storageFiles.Add(storageFile);
         }
-        Log.Verbose(nameof(UPC_StorageFileListGet), ["storageFiles Count: ", storageFiles.Count]);
+        Log.Verbose("[{Function}] storageFiles Count: {Count}", nameof(UPC_StorageFileListGet), storageFiles.Count);
         if (storageFiles.Count == 0)
             return -6;
         WriteOutList(outStorageFileList, storageFiles);
@@ -41,7 +41,7 @@ internal static class Storage
     [UnmanagedCallersOnly(EntryPoint = "UPC_StorageFileListFree", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_StorageFileListFree(IntPtr inContext, IntPtr inStorageFileList)
     {
-        Log.Verbose(nameof(UPC_StorageFileListFree), [inContext, inStorageFileList]);
+        Log.Verbose("[{Function}] {inContext} {inStorageFileList}", nameof(UPC_StorageFileListFree), inContext, inStorageFileList);
         if (inStorageFileList == IntPtr.Zero)
             return -0xd;
         FreeList(inStorageFileList);
@@ -51,7 +51,7 @@ internal static class Storage
     [UnmanagedCallersOnly(EntryPoint = "UPC_StorageFileOpen", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_StorageFileOpen(IntPtr inContext, IntPtr inFileNameUtf8, uint inFlags, IntPtr outHandle)
     {
-        Log.Verbose(nameof(UPC_StorageFileOpen), [inContext, inFileNameUtf8, inFlags, outHandle]);
+        Log.Verbose("[{Function}] {inContext} {inFileNameUtf8} {inFlags} {outHandle}", nameof(UPC_StorageFileOpen), inContext, inFileNameUtf8, inFlags, outHandle);
         UPC_Context? context = UPC_ContextExt.GetContext(inContext);
         if (context == null)
             return (int)UPC_Result.UPC_Result_InternalError;
@@ -60,7 +60,7 @@ internal static class Storage
             return (int)UPC_Result.UPC_Result_CommunicationError;
         string file = string.Empty;
         if (UPC_Json.Instance.Save.UseProductIdInName)
-            file = Path.Combine(UPC_Json.Instance.Save.Path, Init.ProductId.ToString(), filename);
+            file = Path.Combine(UPC_Json.Instance.Save.Path, ProductId.ToString(), filename);
         else
             file = Path.Combine(UPC_Json.Instance.Save.Path, filename);
         if (!Directory.Exists(Path.GetDirectoryName(file)))
@@ -69,7 +69,7 @@ internal static class Storage
             File.Create(file).Close();
         int ptr = Random.Shared.Next();
         PtrToFilePath.Add(ptr, file);
-        Log.Verbose(nameof(UPC_StorageFileOpen), ["File handler", ptr]);
+        Log.Verbose("[{Function}] File Handler: {handler}!", nameof(UPC_StorageFileOpen), ptr);
         Marshal.WriteInt32(outHandle, 0, ptr);
         return 0;
     }
@@ -77,7 +77,7 @@ internal static class Storage
     [UnmanagedCallersOnly(EntryPoint = "UPC_StorageFileRead", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_StorageFileRead(IntPtr inContext, int inHandle, int inBytesToRead, uint inBytesReadOffset, IntPtr outData, IntPtr outBytesRead, IntPtr inCallback, IntPtr inCallbackData)
     {
-        Log.Verbose(nameof(UPC_StorageFileRead), [inContext, inHandle, inBytesToRead, inBytesReadOffset, outData, outBytesRead, inCallback, inCallbackData]);
+        Log.Verbose("[{Function}] {inContext} {inHandle} {inBytesToRead} {inBytesReadOffset} {outData} {outBytesRead} {inCallback} {inCallbackData}", nameof(UPC_StorageFileRead), inContext, inHandle, inBytesToRead, inBytesReadOffset, outData, outBytesRead, inCallback, inCallbackData);
         UPC_Context? context = UPC_ContextExt.GetContext(inContext);
         if (context == null)
             return (int)UPC_Result.UPC_Result_InternalError;
@@ -112,7 +112,7 @@ internal static class Storage
         var buff = new byte[inBytesToRead];
         var readed = stream.Read(buff, (int)inBytesReadOffset, inBytesToRead);
         stream.Close();
-        Log.Verbose(nameof(UPC_StorageFileRead), ["bytes readed:", readed, "must read:", inBytesToRead]);
+        Log.Verbose("[{Function}] bytes readed: {Readed} must read: {MustRead}", nameof(UPC_StorageFileRead), readed, inBytesToRead);
         if (readed < 0)
         {
             context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_EOF));
@@ -121,14 +121,14 @@ internal static class Storage
         Marshal.WriteInt32(outBytesRead, readed);
         Marshal.Copy(buff, 0, outData, buff.Length);
         context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_Ok));
-        Log.Verbose(nameof(UPC_StorageFileRead), ["Read Done!"]);
+        Log.Verbose("[{Function}] Write Done!", nameof(UPC_StorageFileRead));
         return 0x10000;
     }
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_StorageFileWrite", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_StorageFileWrite(IntPtr inContext, int inHandle, IntPtr inData, int inSize, IntPtr inCallback, IntPtr inCallbackData)
     {
-        Log.Verbose(nameof(UPC_StorageFileWrite), [inContext, inHandle, inData, inSize, inCallback, inCallbackData]);
+        Log.Verbose("[{Function}] {inContext} {inHandle} {inData} {inSize} {inCallback} {inCallbackData}", nameof(UPC_StorageFileWrite), inContext, inHandle, inData, inSize, inCallback, inCallbackData);
         UPC_Context? context = UPC_ContextExt.GetContext(inContext);
         if (context == null)
             return (int)UPC_Result.UPC_Result_InternalError;
@@ -149,14 +149,14 @@ internal static class Storage
         stream.Flush(true);
         stream.Close();
         context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_Ok));
-        Log.Verbose(nameof(UPC_StorageFileWrite), ["Write Done!"]);
+        Log.Verbose("[{Function}] Write Done!", nameof(UPC_StorageFileWrite));
         return 0x10000;
     }
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_StorageFileClose", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_StorageFileClose(IntPtr inContext, int inHandle)
     {
-        Log.Verbose(nameof(UPC_StorageFileClose), [inContext, inHandle]);
+        Log.Verbose("[{Function}] {inContext} {inHandle}", nameof(UPC_StorageFileClose), inContext, inHandle);
         PtrToFilePath.Remove(inHandle);
         return 0;
     }
@@ -164,7 +164,7 @@ internal static class Storage
     [UnmanagedCallersOnly(EntryPoint = "UPC_StorageFileDelete", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_StorageFileDelete(IntPtr inContext, IntPtr inFileNameUtf8)
     {
-        Log.Verbose(nameof(UPC_StorageFileDelete), [inContext, inFileNameUtf8]);
+        Log.Verbose("[{Function}] {inContext} {inFileNameUtf8}", nameof(UPC_StorageFileDelete), inContext, inFileNameUtf8);
         UPC_Context? context = UPC_ContextExt.GetContext(inContext);
         if (context == null)
             return (int)UPC_Result.UPC_Result_InternalError;
@@ -175,7 +175,7 @@ internal static class Storage
                 return 0;
             string file = string.Empty;
             if (UPC_Json.Instance.Save.UseProductIdInName)
-                file = Path.Combine(UPC_Json.Instance.Save.Path, Init.ProductId.ToString(), fileName);
+                file = Path.Combine(UPC_Json.Instance.Save.Path, ProductId.ToString(), fileName);
             else
                 file = Path.Combine(UPC_Json.Instance.Save.Path, fileName);
             if (string.IsNullOrEmpty(file))

@@ -1,18 +1,18 @@
 ﻿namespace upc_r2.Exports;
 
-internal static class Events
+internal static partial class Export
 {
     [UnmanagedCallersOnly(EntryPoint = "UPC_EventNextPeek", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_EventNextPeek(IntPtr inContext, IntPtr outEvent)
     {
-        //Log.Verbose(nameof(UPC_EventNextPeek), new object[] { inContext, outEvent });
+        Log.Verbose("[{Function}] {inContext} {outEvent}", nameof(UPC_EventNextPeek), inContext, outEvent);
         return (int)UPC_Result.UPC_Result_Ok;
     }
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_EventNextPoll", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_EventNextPoll(IntPtr inContext, IntPtr outEvent)
     {
-        //Log.Verbose(nameof(UPC_EventNextPoll), new object[] { inContext, outEvent });
+        Log.Verbose("[{Function}] {inContext} {outEvent}", nameof(UPC_EventNextPoll), inContext, outEvent);
         return (int)UPC_Result.UPC_Result_NotFound;
     }
 

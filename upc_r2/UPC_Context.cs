@@ -2,7 +2,7 @@
 
 namespace upc_r2;
 
-public class UPC_Context
+internal class UPC_Context
 {
     public UPC_ContextSubsystem EnabledSubsystems = UPC_ContextSubsystem.UPC_ContextSubsystem_None;
     public List<Callback> Callbacks = [];
@@ -11,7 +11,7 @@ public class UPC_Context
     // TODO Add valid events here. or something.
 }
 
-public static class UPC_ContextExt
+internal static class UPC_ContextExt
 {
     private static readonly Dictionary<IntPtr, UPC_Context> pointerToCTX = [];
 

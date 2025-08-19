@@ -1,4 +1,5 @@
 ﻿using DllShared;
+using Serilog.Events;
 using System.Text.Json;
 
 namespace upc_r2;
@@ -33,8 +34,7 @@ public class UPC_Json
 
     public class BasicLog
     {
-        public bool ReqLog { get; set; }
-        public bool RspLog { get; set; }
+        public LogEventLevel LogLevel { get; set; } = LogEventLevel.Information;
         public bool UseNamePipeClient { get; set; }
         public uint WaitBetweebUpdate { get; set; } = 20_000;
         public bool LogUpdate { get; set; }
