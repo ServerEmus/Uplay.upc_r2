@@ -33,6 +33,13 @@ jobs:
     - name: Build X86
       run: dotnet publish ${{ env.ProjName }}/${{ env.ProjName }}.csproj -r win-x86 -c:Release -p:Platform=x86 -o Out
 
+    - name : Sign
+      uses: dlemstra/code-sign-action@v1
+      with:
+        certificate: '${{ secrets.ServerEmusSign_PFX }}'
+        folder: 'Out'
+        recursive: true
+
     - name : Upload
       uses: actions/upload-artifact@v4.3.5
       with:
