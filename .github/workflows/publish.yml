@@ -47,5 +47,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-		Out/${{ env.ProjName }}**.dll
-		Out/Mapping.txt
+            Out/${{ env.ProjName }}**.dll
+            Out/Mapping.txt
