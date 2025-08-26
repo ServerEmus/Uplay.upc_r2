@@ -31,7 +31,7 @@ jobs:
       - name : Sign
         uses: dlemstra/code-sign-action@v1
         with:
-          certificate: '${{ secrets.ServerEmusSign_PFX }}'
+          certificate: '${{ secrets.Sign_PFX }}'
           folder: 'Out'
           recursive: true
 
