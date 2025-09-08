@@ -10,10 +10,10 @@ internal static partial class Export
     }
 
     [UnmanagedCallersOnly(EntryPoint = "UPC_EmailGet_Extended", CallConvs = [typeof(CallConvCdecl)])]
-    public static int UPC_EmailGet_Extended(IntPtr inContext, , IntPtr emailptr)
+    public static int UPC_EmailGet_Extended(IntPtr inContext, IntPtr emailptr)
     {
         Log.Verbose("[{Function}] {inContext}", nameof(UPC_EmailGet_Extended), inContext);
-        Marshal.WriteIntPtr(idptr, 0, Marshal.StringToHGlobalAnsi(UPC_Json.Instance.Account.Email));
+        Marshal.WriteIntPtr(emailptr, 0, Marshal.StringToHGlobalAnsi(UPC_Json.Instance.Account.Email));
         return (int)UPC_Result.UPC_Result_Ok;
     }
 
