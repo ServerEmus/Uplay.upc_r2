@@ -36,7 +36,7 @@ public class UPC_Json
     {
         public LogEventLevel LogLevel { get; set; } = LogEventLevel.Information;
         public bool UseNamePipeClient { get; set; }
-        public uint WaitBetweebUpdate { get; set; } = 20_000;
+        public uint WaitBetweenUpdate { get; set; } = 20_000;
         public bool LogUpdate { get; set; }
     }
 
@@ -53,7 +53,7 @@ public class UPC_Json
 
     public class Save
     {
-        public string Path { get; set; } = string.Empty;
+        public string Path { get; set; } = "saves";
         public bool UseProductIdInName { get; set; }
         public bool EnableFileDelete { get; set; }
     }

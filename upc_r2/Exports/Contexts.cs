@@ -37,13 +37,13 @@ internal static partial class Export
             return 0;
         //Internal waiting update for reason
         context.SW.Stop();
-        if (context.SW.ElapsedTicks <= UPC_Json.Instance.BasicLog.WaitBetweebUpdate)
+        if (context.SW.ElapsedTicks <= UPC_Json.Instance.BasicLog.WaitBetweenUpdate)
         {
             context.SW.Start();
             return 0;
         }
         if (UPC_Json.Instance.BasicLog.LogUpdate)
-            Log.Verbose("[{Function}] ElapsedTicks: {ElapsedTicks} WaitBetweebUpdate: {WaitBetweebUpdate}", nameof(UPC_Update), context.SW.ElapsedTicks, UPC_Json.Instance.BasicLog.WaitBetweebUpdate);
+            Log.Verbose("[{Function}] ElapsedTicks: {ElapsedTicks} WaitBetweebUpdate: {WaitBetweebUpdate}", nameof(UPC_Update), context.SW.ElapsedTicks, UPC_Json.Instance.BasicLog.WaitBetweenUpdate);
         context.SW.Restart();
         if (UPC_Json.Instance.BasicLog.LogUpdate)
             Log.Verbose("[{Function}] Current Callbacks Count: {Count}", nameof(UPC_Update), context.Callbacks.Count);
