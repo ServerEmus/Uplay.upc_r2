@@ -14,7 +14,7 @@ internal static partial class Export
         List<UPC_StorageFile> storageFiles = [];
         if (string.IsNullOrEmpty(UPC_Json.Instance.Save.Path))
         {
-            UPC_Json.Instance.Save.Path = "saves";
+            UPC_Json.Instance.Save.Path = "./saves";
             UPC_Json.SaveToJson();
         }
             
@@ -127,7 +127,7 @@ internal static partial class Export
         Marshal.WriteInt32(outBytesRead, readed);
         Marshal.Copy(buff, 0, outData, buff.Length);
         context.Callbacks.Add(new(inCallback, inCallbackData, (int)UPC_Result.UPC_Result_Ok));
-        Log.Verbose("[{Function}] Write Done!", nameof(UPC_StorageFileRead));
+        Log.Verbose("[{Function}] Read Done!", nameof(UPC_StorageFileRead));
         return 0x10000;
     }
 
