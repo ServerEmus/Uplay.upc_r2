@@ -53,7 +53,7 @@ public class UPC_Json
 
     public class Save
     {
-        public string Path { get; set; } = "saves";
+        public string Path { get; set; } = "./saves";
         public bool UseProductIdInName { get; set; }
         public bool EnableFileDelete { get; set; }
     }
