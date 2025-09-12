@@ -12,6 +12,12 @@ internal static partial class Export
         if (context == null)
             return (int)UPC_Result.UPC_Result_InternalError;
         List<UPC_StorageFile> storageFiles = [];
+        if (string.IsNullOrEmpty(UPC_Json.Instance.Save.Path))
+        {
+            UPC_Json.Instance.Save.Path = "saves";
+            UPC_Json.SaveToJson();
+        }
+            
         Log.Verbose("[{Function}] Save Path: {Path}", nameof(UPC_StorageFileListGet), UPC_Json.Instance.Save.Path);
         if (!Directory.Exists(UPC_Json.Instance.Save.Path))
             Directory.CreateDirectory(UPC_Json.Instance.Save.Path);
