@@ -30,7 +30,7 @@ internal static partial class Export
     [UnmanagedCallersOnly(EntryPoint = "UPC_AchievementListGet", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_AchievementListGet(IntPtr inContext, IntPtr inOptUserIdUtf8, uint inFilter, IntPtr outAchievementList, IntPtr inCallback, IntPtr inCallbackData)
     {
-        Log.Verbose("[{Function}] {inContext} {inId} {inOptUserIdUtf8} {inFilter} {outAchievementList} {inCallback} {inCallbackData}", nameof(UPC_AchievementListGet), inContext, inOptUserIdUtf8, inFilter, outAchievementList, inCallback, inCallbackData);
+        Log.Verbose("[{Function}] {inContext} {inOptUserIdUtf8} {inFilter} {outAchievementList} {inCallback} {inCallbackData}", nameof(UPC_AchievementListGet), inContext, inOptUserIdUtf8, inFilter, outAchievementList, inCallback, inCallbackData);
         UPC_Context? context = UPC_ContextExt.GetContext(inContext);
         if (context == null)
             return (int)UPC_Result.UPC_Result_InternalError;
