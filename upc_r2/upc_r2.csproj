@@ -33,14 +33,9 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Obfuscar" Version="2.2.49">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 		<PackageReference Include="ServerEmus.DllShared" Version="1.0.2" />
 		<PackageReference Include="ServerEmus.Shared" Version="1.1.0" />
 		<PackageReference Include="StbImageSharp" Version="2.30.15" Publicize="true" />
-		<PackageReference Include="Uplay-Protobufs" Version="161.1.11646" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -49,20 +44,4 @@
 		<Using Include="System.Runtime.CompilerServices" />
 		<Using Include="System.Runtime.InteropServices" />
 	</ItemGroup>
-
-	<Target Name="Obfuscation" AfterTargets="AfterCompile" Condition="'$(Configuration)'=='Release'">
-		<Message Text="Obfuscating" Importance="high" />
-		<!--Optional to log a message.-->
-		<Exec Condition="'$(_IsPublishing)' == 'true' and '$(Platform)'=='x64'" Command="$(Obfuscar) -v:q obfuscar_publish_x64.xml" />
-		<Exec Condition="'$(_IsPublishing)' == 'true' and '$(Platform)'=='x86'" Command="$(Obfuscar) -v:q obfuscar_publish_x86.xml" />
-		<Exec Condition="'$(_IsPublishing)' == '' and '$(Platform)'=='x64'" Command="$(Obfuscar) -v:q obfuscar_release_x64.xml" />
-		<Exec Condition="'$(_IsPublishing)' == '' and '$(Platform)'!='x64'" Command="$(Obfuscar) -v:q obfuscar_release.xml" />
-		<Exec Command="COPY $(ProjectDir)$(IntermediateOutputPath)Protected\$(TargetFileName) $(ProjectDir)$(IntermediateOutputPath)$(TargetFileName)" />
-		<Exec Command="COPY $(ProjectDir)$(IntermediateOutputPath)Protected\Mapping.txt $(OutputPath)Mapping.txt" />
-	</Target>
-
-	<Target Name="MoveMapping" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
-		<Message Text="Move Mapping" Importance="high" />
-		<Exec Command="COPY $(ProjectDir)$(IntermediateOutputPath)Protected\Mapping.txt $(PublishDir)Mapping.txt" />
-	</Target>
 </Project>
