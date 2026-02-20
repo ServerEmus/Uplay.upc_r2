@@ -72,6 +72,20 @@ internal static partial class Export
         return -4;
     }
 
+    [UnmanagedCallersOnly(EntryPoint = "UPC_StreamingTextEntryOpen", CallConvs = [typeof(CallConvCdecl)])]
+    public static int UPC_StreamingTextEntryOpen(IntPtr inContext, IntPtr inSettings, IntPtr callback, IntPtr callbackData, IntPtr outHandle)
+    {
+        Log.Verbose("[{Function}] {inContext} {inSettings} {callback} {callbackData} {outHandle}", nameof(UPC_StreamingTextEntryOpen), inContext, inSettings, callback, callbackData, outHandle);
+        return -4;
+    }
+
+    [UnmanagedCallersOnly(EntryPoint = "UPC_StreamingTextEntryClose", CallConvs = [typeof(CallConvCdecl)])]
+    public static int UPC_StreamingTextEntryClose(IntPtr inContext, IntPtr inHandle, IntPtr callback, IntPtr callbackData)
+    {
+        Log.Verbose("[{Function}] {inContext} {inHandle} {callback} {callbackData}", nameof(UPC_StreamingTextEntryOpen), inContext, inHandle, callback, callbackData);
+        return -4;
+    }
+
     [UnmanagedCallersOnly(EntryPoint = "UPC_StreamingTypeGet", CallConvs = [typeof(CallConvCdecl)])]
     public static int UPC_StreamingTypeGet(IntPtr inContext, IntPtr outType)
     {

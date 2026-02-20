@@ -83,4 +83,40 @@ internal static partial class Export
         Marshal.WriteInt32(outIsCrossBootAllowed, 0, Convert.ToInt32(UPC_Json.Instance.Others.EnableCrossBoot));
         return 0;
     }
+
+    [UnmanagedCallersOnly(EntryPoint = "UPC_CrossBootStatusGet", CallConvs = [typeof(CallConvCdecl)])]
+    public static int UPC_CrossBootStatusGet(IntPtr inContext, IntPtr inProductIds, IntPtr inProductCount, IntPtr outCrossBootStatusList)
+    {
+        Log.Verbose("[{Function}] {inContext} {inProductId} {inProductIds} {inProductCount} {outCrossBootStatusList}", nameof(UPC_CrossBootStatusGet), inContext, inProductIds, inProductCount, outCrossBootStatusList);
+        return -4;
+    }
+
+    [UnmanagedCallersOnly(EntryPoint = "UPC_CrossBootStatusListFree", CallConvs = [typeof(CallConvCdecl)])]
+    public static int UPC_CrossBootStatusListFree(IntPtr inContext, IntPtr inCrossBootStatusList)
+    {
+        Log.Verbose("[{Function}] {inContext} {inCrossBootStatusList}", nameof(UPC_CrossBootStatusListFree), inContext, inCrossBootStatusList);
+        return 0;
+    }
+
+    [UnmanagedCallersOnly(EntryPoint = "UPC_CrossBootStatusListFree", CallConvs = [typeof(CallConvCdecl)])]
+    public static int UPC_IsInOfflineMode(IntPtr inContext, IntPtr outIsInOfflineMode)
+    {
+        Log.Verbose("[{Function}] {inContext} {outIsInOfflineMode}", nameof(UPC_CrossBootStatusListFree), inContext, outIsInOfflineMode);
+        Marshal.WriteByte(inContext, UPC_Json.Instance.Account.IsOffline ? (byte)1 : (byte)0);
+        return 0;
+    }
+
+    [UnmanagedCallersOnly(EntryPoint = "UPC_LaunchAppParamListGet", CallConvs = [typeof(CallConvCdecl)])]
+    public static int UPC_LaunchAppParamListGet(IntPtr inContext, IntPtr outParamList)
+    {
+        Log.Verbose("[{Function}] {inContext} {outParamList}", nameof(UPC_LaunchAppParamListGet), inContext, outParamList);
+        return -4;
+    }
+
+    [UnmanagedCallersOnly(EntryPoint = "UPC_LaunchAppParamListFree", CallConvs = [typeof(CallConvCdecl)])]
+    public static int UPC_LaunchAppParamListFree(IntPtr inContext, IntPtr inParamList)
+    {
+        Log.Verbose("[{Function}] {inContext} {inParamList}", nameof(UPC_CrossBootStatusListFree), inContext, inParamList);
+        return 0;
+    }
 }
